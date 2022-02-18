@@ -1,6 +1,8 @@
 package main
 
 import (
+	"log"
+
 	"github.com/deadsy/sdfx/render"
 	"github.com/deadsy/sdfx/sdf"
 )
@@ -25,13 +27,32 @@ const (
 	CAPWIDTH    = 16.5 //z
 )
 
-func keeb() sdf.SDF3 {
-
-	return nil
+func plate() (sdf.SDF3, error) {
+	return rect(PLATELENGTH, PLATEHEIGHT, PLATEWIDTH)
 }
 
 func main() {
-	render.ToSTL(keeb(), 300, "pool1.stl", &render.MarchingCubesOctree{})
+	plate, err := plate()
+	if err != nil {
+		log.Fatal("error: %s", err)
+	}
+	render.ToSTL(plate, 300, "keeb.stl", &render.MarchingCubesOctree{})
+}
+
+func rect(x, y, z float64) (sdf.SDF3, error) {
+	dimensions := []sdf.V2{
+		{0.0, 0.0},
+		{x, 0.0},
+		{x, z},
+		{0.0, z},
+	}
+	p := sdf.NewPolygon()
+	p.AddV2Set(dimensions)
+	profile, err := sdf.Polygon2D(p.Vertices())
+	if err != nil {
+		return nil, err
+	}
+	return sdf.Extrude3D(profile, y), err
 }
 
 //-----------------------------------------------------------------------------
