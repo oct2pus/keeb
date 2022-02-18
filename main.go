@@ -12,15 +12,18 @@ import (
 const (
 	// plate
 	PLATELENGTH = 285.0 //x
-	PLATEHEIGHT = 1.2 //y
-	PLATEWIDTH = 94.6 //z
+	PLATEHEIGHT = 1.2   //y
+	PLATEWIDTH  = 94.6  //z
 	// keyswitch
-	SWITCHWIDTH = 15 // square
+	SWITCHWIDTH  = 15 // square
 	SWITCHLENGTH = 15 // square
 	// keycap
-	CAPLENGTH = 
+	CAP1LENGTH  = 17.5 //x
+	CAP15LENGTH = 17.5 * 1.5
+	CAP2LENGTH  = 17.5 * 2
+	CAPHEIGHT   = 1    //y for reference only
+	CAPWIDTH    = 16.5 //z
 )
-
 
 func keeb() sdf.SDF3 {
 
