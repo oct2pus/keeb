@@ -1,0 +1,3 @@
+[submodule "keyboard_parts"]
+	path = keyboard_parts
+	url = https://github.com/daprice/keyboard_parts.git
