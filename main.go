@@ -112,8 +112,8 @@ func plate() (sdf.SDF3, error) {
 	keycaps := keyCaps()
 	for _, row := range keycaps {
 		for _, cap := range row {
-			x, z := (cap.x2-cap.x1)/2, (cap.z2-cap.z1)/2
-			keySwitch := sdf.NewBox2(sdf.V2{x, z}, sdf.V2{SWITCHLENGTH, SWITCHWIDTH})
+			x, z := (cap.x1 + (cap.x2-cap.x1)/2), (cap.z1 + (cap.z2-cap.z1)/2)
+			keySwitch := sdf.NewBox2(sdf.V2{x, z}, sdf.V2{SWITCHLENGTH / 2, SWITCHWIDTH / 2})
 			profile, err := sdf.Polygon2D(keySwitch.Vertices())
 			if err != nil {
 				return nil, err
@@ -130,7 +130,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("error: %s\n", err)
 	}
-	render.ToSTL(plate, 300, "keeb.stl", &render.MarchingCubesUniform{})
+	render.ToSTL(plate, 1000, "keeb.stl", &render.MarchingCubesUniform{})
 	keycaps, err := drawKeyCaps()
 	if err != nil {
 		log.Fatalf("error: %s\n", err)
