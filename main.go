@@ -62,11 +62,6 @@ const (
 	ROWCOUNT = 5
 )
 
-func plate() (sdf.SDF3, error) {
-	plate := rect(0, 0, PLATELENGTH, PLATEHEIGHT, PLATEWIDTH)
-}
-	return plate
-
 func keyCaps() []row {
 	// this is about to get a lil silly
 	sideWidthGaps := gapLength(PLATEWIDTH, (SWITCHWIDTH * ROWCOUNT), ROWCOUNT+1)                // 5 rows, so 6 gaps including exterior, so we add 1
@@ -107,6 +102,27 @@ func drawKeyCaps() (sdf.SDF3, error) {
 	}
 
 	return s, nil
+}
+
+func plate() (sdf.SDF3, error) {
+	plate, err := rect(0, 0, PLATELENGTH, PLATEHEIGHT, PLATEWIDTH)
+	if err != nil {
+		return nil, err
+	}
+	keycaps := keyCaps()
+	for _, row := range keycaps {
+		for _, cap := range row {
+			x, z := (cap.x2-cap.x1)/2, (cap.z2-cap.z1)/2
+			keySwitch := sdf.NewBox2(sdf.V2{x, z}, sdf.V2{SWITCHLENGTH, SWITCHWIDTH})
+			profile, err := sdf.Polygon2D(keySwitch.Vertices())
+			if err != nil {
+				return nil, err
+			}
+			keySwitchHole := sdf.Extrude3D(profile, PLATELENGTH)
+			plate = sdf.Difference3D(plate, keySwitchHole)
+		}
+	}
+	return plate, nil
 }
 
 func main() {
