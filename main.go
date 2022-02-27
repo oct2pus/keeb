@@ -141,7 +141,7 @@ func main() {
 		log.Fatalf("error: %s\n", err)
 	}
 
-	render.ToSTL(keycaps, 300, "keycaps.stl", &render.MarchingCubesOctree{})
+	render.ToSTL(keycaps, 1000, "keycaps.stl", &render.MarchingCubesOctree{})
 }
 
 func rect(x1, z1, x2, y, z2 float64) (sdf.SDF3, error) {
