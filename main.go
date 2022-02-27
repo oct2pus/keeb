@@ -64,7 +64,7 @@ const (
 
 func keyCaps() []row {
 	// this is about to get a lil silly
-	sideWidthGaps := gapLength(PLATEWIDTH, (SWITCHWIDTH * ROWCOUNT), ROWCOUNT+1)                // 5 rows, so 6 gaps including exterior, so we add 1
+	sideWidthGaps := gapLength(PLATEWIDTH-4.6, (SWITCHWIDTH * ROWCOUNT), ROWCOUNT+2)            // 5 rows, so 6 gaps including exterior, so we add 1
 	row1Gaps := gapLength(PLATELENGTH-(sideWidthGaps*2), (2*CAP15LENGTH)+(12*CAP1LENGTH), 14-1) // we want consistent gaps on the outside, so remove those, we don't include exterior at all so we subtract 1.
 	row2Gaps := gapLength(PLATELENGTH-(sideWidthGaps*2), (2*CAP15LENGTH)+(12*CAP1LENGTH), 14-1) // split for unneccessary futureproofing
 	row3Gaps := gapLength(PLATELENGTH-(sideWidthGaps*2), (2*CAP2LENGTH)+(11*CAP1LENGTH), 13-1)
@@ -73,11 +73,11 @@ func keyCaps() []row {
 	rows := make([]row, ROWCOUNT)
 
 	// this can be turned into a loop
-	rows[0] = newRow(sideWidthGaps, sideWidthGaps, row1Gaps, CAP15LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP15LENGTH)
-	rows[1] = newRow(sideWidthGaps, (sideWidthGaps*2)+(CAPWIDTH*1), row2Gaps, CAP15LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP15LENGTH)
-	rows[2] = newRow(sideWidthGaps, (sideWidthGaps*3)+(CAPWIDTH*2), row3Gaps, CAP2LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP2LENGTH)
-	rows[3] = newRow(sideWidthGaps, (sideWidthGaps*4)+(CAPWIDTH*3), row4Gaps, CAP2LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP2LENGTH)
-	rows[4] = newRow(sideWidthGaps, (sideWidthGaps*5)+(CAPWIDTH*4), row5Gaps, CAP1LENGTH, CAP1LENGTH, CAP15LENGTH, CAP1LENGTH, CAP2LENGTH, CAP2LENGTH, CAP2LENGTH, CAP1LENGTH/2, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH)
+	rows[0] = newRow(sideWidthGaps, 0, row1Gaps, CAP15LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP15LENGTH)
+	rows[1] = newRow(sideWidthGaps, (sideWidthGaps*1)+(CAPWIDTH*1), row2Gaps, CAP15LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP15LENGTH)
+	rows[2] = newRow(sideWidthGaps, (sideWidthGaps*2)+(CAPWIDTH*2), row3Gaps, CAP2LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP2LENGTH)
+	rows[3] = newRow(sideWidthGaps, (sideWidthGaps*3)+(CAPWIDTH*3), row4Gaps, CAP2LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP2LENGTH)
+	rows[4] = newRow(sideWidthGaps, (sideWidthGaps*4)+(CAPWIDTH*4), row5Gaps, CAP1LENGTH, CAP1LENGTH, CAP15LENGTH, CAP1LENGTH, CAP2LENGTH, CAP2LENGTH, CAP2LENGTH, CAP1LENGTH/2, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH)
 	return rows
 }
 
@@ -114,7 +114,12 @@ func plate() (sdf.SDF3, error) {
 		for _, cap := range row {
 			x, z := (cap.x1 + (cap.x2-cap.x1)/2), (cap.z1 + (cap.z2-cap.z1)/2)
 			keySwitch := sdf.NewBox2(sdf.V2{x, z}, sdf.V2{SWITCHLENGTH / 2, SWITCHWIDTH / 2})
-			profile, err := sdf.Polygon2D(keySwitch.Vertices())
+			p := sdf.NewPolygon()
+			p.AddV2(keySwitch.Min)
+			p.AddV2(sdf.V2{keySwitch.Max.X, keySwitch.Min.Y})
+			p.AddV2(keySwitch.Max)
+			p.AddV2(sdf.V2{keySwitch.Min.X, keySwitch.Max.Y})
+			profile, err := sdf.Polygon2D(p.Vertices())
 			if err != nil {
 				return nil, err
 			}
