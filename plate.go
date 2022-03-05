@@ -12,8 +12,8 @@ const (
 	SWITCHLENGTH = 15 // square
 )
 
-func plate() (sdf.SDF3, error) {
-	plate, err := rect(0, 0, PLATELENGTH, PLATEHEIGHT, PLATEWIDTH)
+func plate(x, y, z float64) (sdf.SDF3, error) {
+	plate, err := rect(0, 0, x, y, z)
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +31,7 @@ func plate() (sdf.SDF3, error) {
 			if err != nil {
 				return nil, err
 			}
-			keySwitchHole := sdf.Extrude3D(profile, PLATELENGTH)
+			keySwitchHole := sdf.Extrude3D(profile, x)
 			plate = sdf.Difference3D(plate, keySwitchHole)
 		}
 	}

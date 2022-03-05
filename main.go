@@ -10,7 +10,7 @@ import (
 // all measurements should be in millimeters
 
 func main() {
-	plate, err := plate()
+	plate, err := plate(PLATELENGTH, PLATEHEIGHT, PLATEWIDTH)
 	if err != nil {
 		log.Fatalf("error: %s\n", err)
 	}
