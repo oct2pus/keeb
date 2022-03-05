@@ -2,11 +2,29 @@ package main
 
 import "github.com/deadsy/sdfx/sdf"
 
-type row []keycap
-
 const (
-	ROWCOUNT = 5
+	CAP1LENGTH  = 17.5 //x
+	CAP15LENGTH = 17.5 * 1.5
+	CAP2LENGTH  = 17.5 * 2
+	CAPHEIGHT   = 1    //y for reference only
+	CAPWIDTH    = 16.5 //z
+	ROWCOUNT    = 5
 )
+
+type keycap struct {
+	x1, x2, z1, z2 float64
+}
+
+func (kc keycap) Dimensions() []sdf.V2 {
+	return []sdf.V2{
+		{kc.x1, kc.z1},
+		{kc.x2, kc.z1},
+		{kc.x2, kc.z2},
+		{kc.x1, kc.z2},
+	}
+}
+
+type row []keycap
 
 func newRow(inX, inZ, gap float64, keys ...float64) row {
 	row := make([]keycap, 0, 0)
