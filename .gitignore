@@ -6,6 +6,9 @@
 *.so
 *.dylib
 
+#.STL files
+*.STL
+
 # Test binary, built with `go test -c`
 *.test
 
