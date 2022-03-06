@@ -11,28 +11,38 @@ const (
 	ROWCOUNT    = 5
 )
 
-type keycap struct {
-	x1, x2, z1, z2 float64
+// KeyCap represents a singular KeyCap.
+type KeyCap struct {
+	X1, X2, Z1, Z2 float64
+	Size           float64
 }
 
-func (kc keycap) Dimensions() []sdf.V2 {
+func (kc KeyCap) Dimensions() []sdf.V2 {
 	return []sdf.V2{
-		{kc.x1, kc.z1},
-		{kc.x2, kc.z1},
-		{kc.x2, kc.z2},
-		{kc.x1, kc.z2},
+		{kc.X1, kc.Z1},
+		{kc.X2, kc.Z1},
+		{kc.X2, kc.Z2},
+		{kc.X1, kc.Z2},
 	}
 }
 
-// Row is a slice of keycap, represents a row of keys on a keyboard.
-type Row []keycap
+// KeyRow is a slice of keycap, represents a row of keys on a keyboard.
+type KeyRow []KeyCap
+
+func (kr KeyRow) gapLength(plateLength float64) float64 {
+	size := 0.0
+	for i := range kr {
+		size += kr[i].Size
+	}
+	return (plateLength - size) / (float64(len(kr)) - 1)
+}
 
 // newRow creates a new row.
-func newRow(inX, inZ, gap float64, keys ...float64) Row {
-	row := make([]keycap, 0, 0)
+func newRow(inX, inZ, gap float64, keys ...float64) KeyRow {
+	row := make([]KeyCap, 0, 0)
 	x, z := inX, inZ
 	for _, ele := range keys {
-		row = append(row, keycap{x, x + ele, z, z + CAPWIDTH})
+		row = append(row, KeyCap{X1: x, X2: x + ele, Z1: z, Z2: z + CAPWIDTH, Size: CAPWIDTH})
 		x = x + gap + ele
 	}
 	/*
@@ -65,7 +75,7 @@ func gapLength(plateLength float64, keyLength float64, gaps float64) float64 {
 }
 
 func drawKeyCaps() (sdf.SDF3, error) {
-	keyCaps := keyCaps()
+	keyCaps := GenerateRows(5)
 	var s sdf.SDF3
 	caps := make([]sdf.SDF3, 0)
 	for _, row := range keyCaps {
@@ -87,15 +97,15 @@ func drawKeyCaps() (sdf.SDF3, error) {
 	return s, nil
 }
 
-func keyCaps() []Row {
+func GenerateRows(rowCount int) []KeyRow {
 	// this is about to get a lil silly
-	sideWidthGaps := gapLength(PLATEWIDTH-4.6, (SWITCHWIDTH * ROWCOUNT), ROWCOUNT+2)            // 5 rows, so 6 gaps including exterior, so we add 1
+	sideWidthGaps := gapLength(PLATEWIDTH-4.6, (SWITCHWIDTH * ROWCOUNT), ROWCOUNT+2)            // todo: figure out why adding 2 helps.
 	row1Gaps := gapLength(PLATELENGTH-(sideWidthGaps*2), (2*CAP15LENGTH)+(12*CAP1LENGTH), 14-1) // we want consistent gaps on the outside, so remove those, we don't include exterior at all so we subtract 1.
 	row2Gaps := gapLength(PLATELENGTH-(sideWidthGaps*2), (2*CAP15LENGTH)+(12*CAP1LENGTH), 14-1) // split for unneccessary futureproofing
 	row3Gaps := gapLength(PLATELENGTH-(sideWidthGaps*2), (2*CAP2LENGTH)+(11*CAP1LENGTH), 13-1)
 	row4Gaps := gapLength(PLATELENGTH-(sideWidthGaps*2), (2*CAP2LENGTH)+(11*CAP1LENGTH), 13-1)
 	row5Gaps := gapLength(PLATELENGTH-(sideWidthGaps*2), (3*CAP2LENGTH)+(1*CAP15LENGTH)+(7*CAP1LENGTH)+(0.5*CAP1LENGTH), 11) // this one has an additional gapLength to split the arrow keys
-	rows := make([]Row, ROWCOUNT)
+	rows := make([]Row, rowCount)
 
 	// this can be turned into a loop
 	rows[0] = newRow(sideWidthGaps, 2, row1Gaps, CAP15LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP1LENGTH, CAP15LENGTH)
